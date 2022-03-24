@@ -1,0 +1,5 @@
+.DS_Store
+src/.DS_Store
+docs/.DS_Store
+dataset/.DS_Store
+src/*.asv
