@@ -138,6 +138,26 @@ hold off;
 % Using the Scree test, I think that we would choose every single
 % eigenvalue due to the fact that they do not stabilize.
 
+% cumulative variance
+cumulative_variance_pca = zeros(1, dataCHD_normalized{1,1}.dim);
+
+temp = 0;
+for i = 1 : dataCHD_normalized{1,1}.dim
+    temp = temp + model_pca.eigval(i, 1);
+    cumulative_variance_pca(1, i) = temp;
+end
+cumulative_variance_pca = cumulative_variance_pca / sum(model_pca.eigval);
+
+% plot the cumulative variance
+figure(figure_number);
+figure_number = figure_number + 1;
+hold on;
+plot(1 : dataCHD_normalized{1,1}.dim, cumulative_variance_pca);
+plot(1 : dataCHD_normalized{1,1}.dim, ones(1, dataCHD_normalized{1,1}.dim) * 0.8) % threshold of 80% variance
+title('cumulative variance plot pca');
+legend('cumulative variance', '80% threshold');
+hold off;
+
 % get the model with dim = 4.
 dim_pca = sum(model_pca.eigval(:, 1) > 1);
 model_pca = pca(dataCHD_normalized{1,1}.X, dim_pca); % acredito que os novos dados 
@@ -179,6 +199,26 @@ hold off;
 % Using the Scree test, we would also choose one eigenvalue, because the
 % rest are stabilized.
 
+% cumulative variance
+cumulative_variance_lda = zeros(1, copy_dataCHD_normalized_train.dim);
+
+temp = 0;
+for i = 1 : copy_dataCHD_normalized_train.dim
+    temp = temp + model_lda.eigval(i, 1);
+    cumulative_variance_lda(1, i) = temp;
+end
+cumulative_variance_lda = cumulative_variance_lda / sum(model_lda.eigval);
+
+% plot the cumulative variance
+figure(figure_number);
+figure_number = figure_number + 1;
+hold on;
+plot(1 : copy_dataCHD_normalized_train.dim, cumulative_variance_lda);
+plot(1 : copy_dataCHD_normalized_train.dim, ones(1, copy_dataCHD_normalized_train.dim) * 0.8); % threshold of 80% variance
+title('cumulative variance plot lda');
+legend('cumulative variance', '80% threshold');
+hold off;
+
 % LDA (Linear Discriminant Analysis)
 dim_lda = sum(model_lda.eigval(:, 1) > 1);
 model_lda = lda(copy_dataCHD_normalized_train, dim_lda);
@@ -190,6 +230,7 @@ dataCHD_normalized_proj_lda_train = linproj(copy_dataCHD_normalized_train.X, mod
 
 % percentage of variance preserved
 R_lda = sum(model_lda.eigval(1 : dim_lda, 1).^2) / sum(model_lda.eigval(:, 1).^2);
+
 
 %% box plots the features per classe and Kruskal Wallis (Feature Assessment)
 dataCHD_normalized_train = dataCHD_normalized{1, 1};
