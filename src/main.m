@@ -159,7 +159,9 @@ legend('cumulative variance', '80% threshold');
 hold off;
 
 % get the model with dim = 4.
-dim_pca = sum(model_pca.eigval(:, 1) > 1);
+% dim_pca = sum(model_pca.eigval(:, 1) > 1);
+aux = find(cumulative_variance_pca (1, :) > 0.8);
+dim_pca = aux(1, 1);
 model_pca = pca(dataCHD_normalized{1,1}.X, dim_pca); % acredito que os novos dados 
 % sejam tambem diminuidos a 4 dimensoes por este modelo.
 
@@ -181,55 +183,13 @@ copy_dataCHD_normalized_train.y = copy_dataCHD_normalized_train.y + 1;
 model_lda = lda(copy_dataCHD_normalized_train);
 model_lda.eigval = real(diag(model_lda.eigval)); % the eigen values are complex
 
-% plot eigenvalues (Scree plot)
-% https://docs.displayr.com/wiki/Kaiser_Rule
-% https://en.wikipedia.org/wiki/Factor_analysis
-figure(figure_number);
-figure_number = figure_number + 1;
-n_eigvals = size(model_lda.eigval,1);
-hold on;
-plot(1 : n_eigvals, model_lda.eigval, '-o');
-yline(1);
-title('Coronary Heart Disease train data LDA eigenvalues');
-legend('eigenvalues', 'Kaiser treshold');
-hold off;
 
-% In the Scree plot we can see that there is 1 eigenvalue that are higher
-% than 1. Using the Kaiser rule, we would choose that eigenvalue.
-% Using the Scree test, we would also choose one eigenvalue, because the
-% rest are stabilized.
 
-% cumulative variance
-cumulative_variance_lda = zeros(1, copy_dataCHD_normalized_train.dim);
-
-temp = 0;
-for i = 1 : copy_dataCHD_normalized_train.dim
-    temp = temp + model_lda.eigval(i, 1);
-    cumulative_variance_lda(1, i) = temp;
-end
-cumulative_variance_lda = cumulative_variance_lda / sum(model_lda.eigval);
-
-% plot the cumulative variance
-figure(figure_number);
-figure_number = figure_number + 1;
-hold on;
-plot(1 : copy_dataCHD_normalized_train.dim, cumulative_variance_lda);
-plot(1 : copy_dataCHD_normalized_train.dim, ones(1, copy_dataCHD_normalized_train.dim) * 0.8); % threshold of 80% variance
-title('cumulative variance plot lda');
-legend('cumulative variance', '80% threshold');
-hold off;
-
-% LDA (Linear Discriminant Analysis)
-dim_lda = sum(model_lda.eigval(:, 1) > 1);
-model_lda = lda(copy_dataCHD_normalized_train, dim_lda);
-model_lda.eigval = real(diag(model_lda.eigval)); % the eigen values are complex
-
-% Dimensionality of the data was reduced from 15 to 4
+% Dimensionality of the data was reduced from 15 to 1
 dataCHD_normalized_proj_lda_train = linproj(copy_dataCHD_normalized_train.X, model_lda);
-% com 4 dimensoes ja seriam apenas 6 plots.
 
 % percentage of variance preserved
-R_lda = sum(model_lda.eigval(1 : dim_lda, 1).^2) / sum(model_lda.eigval(:, 1).^2);
+% R_lda = sum(model_lda.eigval(1 : dim_lda, 1).^2) / sum(model_lda.eigval(:, 1).^2);
 
 
 %% box plots the features per classe and Kruskal Wallis (Feature Assessment)
@@ -323,14 +283,14 @@ for e = 1 : n_classes
         % histogram and normal curve fitted
         subplot(3, 5 * 2, subplot_inx);
         subplot_inx = subplot_inx + 1;
-        histfit(dataCHD_normalized_train.X(i, :), n_bins);
+        histfit(aux, n_bins);
         title(strcat(independent_vars_names(1,i), " ", class_labels(1,e)));
     
         % empirical CDF vs standard CDF
         subplot(3, 5 * 2, subplot_inx);
         subplot_inx = subplot_inx + 1;
         hold on;
-        cdfplot(dataCHD_normalized_train.X(i, :));
+        cdfplot(aux);
         plot(x_values,normcdf(x_values,0,1),'r-')
         legend('Empirical CDF','Standard Normal CDF','Location','best')
         hold off;
