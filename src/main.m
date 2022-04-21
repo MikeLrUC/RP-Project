@@ -327,117 +327,163 @@ end
 %% Run classifiers
 n_folds = 10;
 % PCA
-k_folds = create_k_folds(dataCHD_normalized_proj_pca{1,1}, n_folds);
+% k_folds = create_k_folds(dataCHD_normalized_proj_pca{1,1}, n_folds);
 % EMDC
-defaultfilename = 'EMDC_PCA_';
-y_pred_EMDC = cell(1, n_folds);
-for i = 1: n_folds % o teste set e o i, os restantes sao treino
-    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
-    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
-    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
-    
-    data = k_folds{1, i}.X; % current fold (test)
-    % obtain the predictions of the model
-    for e = 1 : k_folds{1, i}.num_data
-        ypred_i(1, e) = EMDC(conc_k_folds, prototypes, data(:, e));
-    end
-    y_pred_EMDC{1, i} = ypred_i;
-    % save to file
-    write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
-end
+% defaultfilename = 'EMDC_PCA_';
+% y_pred_EMDC = cell(1, n_folds);
+% for i = 1: n_folds % o teste set e o i, os restantes sao treino
+%     ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+%     conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+%     prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+%     
+%     data = k_folds{1, i}.X; % current fold (test)
+%     % obtain the predictions of the model
+%     for e = 1 : k_folds{1, i}.num_data
+%         ypred_i(1, e) = EMDC(conc_k_folds, prototypes, data(:, e));
+%     end
+%     y_pred_EMDC{1, i} = ypred_i;
+%     % save to file
+%     write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
+% end
 
 % MMDC
-defaultfilename = 'MMDC_PCA_';
-y_pred_MMDC = cell(1, n_folds);
-for i = 1: n_folds % o teste set e o i, os restantes sao treino
-    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
-    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
-    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
-    C = calculate_C(conc_k_folds);
-    
-    data = k_folds{1, i}.X; % current fold (test)
-    % obtain the predictions of the model
-    for e = 1 : k_folds{1, i}.num_data
-        ypred_i(1, e) = MMDC(conc_k_folds, C, prototypes, data(:, e));
-    end
-    y_pred_MMDC{1, i} = ypred_i;
-    % save to file
-    write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
-end
+% defaultfilename = 'MMDC_PCA_';
+% y_pred_MMDC = cell(1, n_folds);
+% for i = 1: n_folds % o teste set e o i, os restantes sao treino
+%     ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+%     conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+%     prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+%     C = calculate_C(conc_k_folds);
+%     
+%     data = k_folds{1, i}.X; % current fold (test)
+%     % obtain the predictions of the model
+%     for e = 1 : k_folds{1, i}.num_data
+%         ypred_i(1, e) = MMDC(conc_k_folds, C, prototypes, data(:, e));
+%     end
+%     y_pred_MMDC{1, i} = ypred_i;
+%     % save to file
+%     write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
+% end
 
 % FLDA
-defaultfilename = 'FLDA_PCA_';
-y_pred_FLDA = cell(1, n_folds);
-for i = 1: n_folds % o teste set e o i, os restantes sao treino
-    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
-    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
-    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
-    
-    data = k_folds{1, i}.X; % current fold (test)
-    % obtain the predictions of the model
-    conc_k_folds.y = conc_k_folds.y + 1; % o fld e esquisito e nao sabe o que e binario... (aceita classes a comecar em 1)
-    model_flda = fld(conc_k_folds);
-    ypred_i(1, :) = linclass(data, model_flda);
-
-    y_pred_FLDA{1, i} = ypred_i;
-    % save to file
-    write_to_file(k_folds{1, i}.y, ypred_i - 1, [defaultfilename, num2str(i), '.csv'])
-end
+% defaultfilename = 'FLDA_PCA_';
+% y_pred_FLDA = cell(1, n_folds);
+% for i = 1: n_folds % o teste set e o i, os restantes sao treino
+%     ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+%     conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+%     % prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+%     
+%     data = k_folds{1, i}.X; % current fold (test)
+%     % obtain the predictions of the model
+%     conc_k_folds.y = conc_k_folds.y + 1; % o fld e esquisito e nao sabe o que e binario... (aceita classes a comecar em 1)
+%     model_flda = fld(conc_k_folds);
+%     ypred_i(1, :) = linclass(data, model_flda);
+% 
+%     y_pred_FLDA{1, i} = ypred_i;
+%     % save to file
+%     write_to_file(k_folds{1, i}.y, ypred_i - 1, [defaultfilename, num2str(i), '.csv'])
+% end
 
 % LDA
-k_folds = create_k_folds(dataCHD_normalized_proj_lda{1,1}, n_folds);
+% k_folds = create_k_folds(dataCHD_normalized_proj_lda{1,1}, n_folds);
 % EMDC
-defaultfilename = 'EMDC_LDA_';
-y_pred_EMDC = cell(1, n_folds);
-for i = 1: n_folds % o teste set e o i, os restantes sao treino
-    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
-    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
-    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
-    
-    data = k_folds{1, i}.X; % current fold (test)
-    % obtain the predictions of the model
-    for e = 1 : k_folds{1, i}.num_data
-        ypred_i(1, e) = EMDC(conc_k_folds, prototypes, data(:, e));
-    end
-    y_pred_EMDC{1, i} = ypred_i;
-    % save to file
-    write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
-end
+% defaultfilename = 'EMDC_LDA_';
+% y_pred_EMDC = cell(1, n_folds);
+% for i = 1: n_folds % o teste set e o i, os restantes sao treino
+%     ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+%     conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+%     prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+%     
+%     data = k_folds{1, i}.X; % current fold (test)
+%     % obtain the predictions of the model
+%     for e = 1 : k_folds{1, i}.num_data
+%         ypred_i(1, e) = EMDC(conc_k_folds, prototypes, data(:, e));
+%     end
+%     y_pred_EMDC{1, i} = ypred_i;
+%     % save to file
+%     write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
+% end
 
 % MMDC
-defaultfilename = 'MMDC_LDA_';
-y_pred_MMDC = cell(1, n_folds);
-for i = 1: n_folds % o teste set e o i, os restantes sao treino
-    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
-    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
-    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
-    C = calculate_C(conc_k_folds);
-    
-    data = k_folds{1, i}.X; % current fold (test)
-    % obtain the predictions of the model
-    for e = 1 : k_folds{1, i}.num_data
-        ypred_i(1, e) = MMDC(conc_k_folds, C, prototypes, data(:, e));
-    end
-    y_pred_MMDC{1, i} = ypred_i;
-    % save to file
-    write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
-end
+% defaultfilename = 'MMDC_LDA_';
+% y_pred_MMDC = cell(1, n_folds);
+% for i = 1: n_folds % o teste set e o i, os restantes sao treino
+%     ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+%     conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+%     prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+%     C = calculate_C(conc_k_folds);
+%     
+%     data = k_folds{1, i}.X; % current fold (test)
+%     % obtain the predictions of the model
+%     for e = 1 : k_folds{1, i}.num_data
+%         ypred_i(1, e) = MMDC(conc_k_folds, C, prototypes, data(:, e));
+%     end
+%     y_pred_MMDC{1, i} = ypred_i;
+%     % save to file
+%     write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
+% end
 
 % FLDA
-defaultfilename = 'FLDA_LDA_';
-y_pred_FLDA = cell(1, n_folds);
-for i = 1: n_folds % o teste set e o i, os restantes sao treino
-    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
-    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
-    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
-    
-    data = k_folds{1, i}.X; % current fold (test)
-    % obtain the predictions of the model
-    conc_k_folds.y = conc_k_folds.y + 1; % o fld e esquisito e nao sabe o que e binario... (aceita classes a comecar em 1)
-    model_flda = fld(conc_k_folds);
-    ypred_i(1, :) = linclass(data, model_flda);
+% defaultfilename = 'FLDA_LDA_';
+% y_pred_FLDA = cell(1, n_folds);
+% for i = 1: n_folds % o teste set e o i, os restantes sao treino
+%     ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+%     conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+%     % prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+%     
+%     data = k_folds{1, i}.X; % current fold (test)
+%     % obtain the predictions of the model
+%     conc_k_folds.y = conc_k_folds.y + 1; % o fld e esquisito e nao sabe o que e binario... (aceita classes a comecar em 1)
+%     model_flda = fld(conc_k_folds);
+%     ypred_i(1, :) = linclass(data, model_flda);
+% 
+%     y_pred_FLDA{1, i} = ypred_i;
+%     % save to file
+%     write_to_file(k_folds{1, i}.y, ypred_i - 1, [defaultfilename, num2str(i), '.csv'])
+% end
 
-    y_pred_FLDA{1, i} = ypred_i;
-    % save to file
-    write_to_file(k_folds{1, i}.y, ypred_i - 1, [defaultfilename, num2str(i), '.csv'])
-end
+% ALL data
+data_train = dataCHD_normalized{1, 1}; % train set
+data_test = dataCHD_normalized{1, 2}; % test set
+
+% EMDC
+% defaultfilename = 'EMDC_ALL_';
+% ypred = zeros(1, data_test.num_data); % save model predictions
+% prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
+% 
+% % obtain the predictions of the model
+% for e = 1 : data_test.num_data
+%     ypred(1, e) = EMDC(data_train, prototypes, data_test.X(:, e));
+% end
+% 
+% % save to file
+% write_to_file(data_test.y, ypred, [defaultfilename, num2str(data_test.dim), '.csv'])
+
+
+% MMDC
+% defaultfilename = 'MMDC_ALL_';
+% ypred = zeros(1, data_test.num_data); % save model predictions
+% prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
+% C = calculate_C(data_train);
+% 
+% % obtain the predictions of the model
+% for e = 1 : data_test.num_data
+%     ypred(1, e) = MMDC(data_train, C, prototypes, data_test.X(:, e));
+% end
+% 
+% % save to file
+% write_to_file(data_test.y, ypred, [defaultfilename, num2str(data_test.dim), '.csv'])
+
+% FLDA
+defaultfilename = 'FLDA_ALL_';
+
+ypred = zeros(1, data_test.num_data); % save model predictions
+% prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
+
+% obtain the predictions of the model
+data_train.y = data_train.y + 1; % o fld e esquisito e nao sabe o que e binario... (aceita classes a comecar em 1)
+model_flda = fld(data_train);
+ypred(1, :) = linclass(data_test.X, model_flda);
+
+% save to file
+write_to_file(data_test.y, ypred - 1, [defaultfilename, num2str(data_test.dim), '.csv'])
