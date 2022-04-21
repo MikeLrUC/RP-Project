@@ -158,16 +158,17 @@ title('cumulative variance plot pca');
 legend('cumulative variance', '80% threshold');
 hold off;
 
-% get the model with dim = 4.
 % dim_pca = sum(model_pca.eigval(:, 1) > 1);
 aux = find(cumulative_variance_pca (1, :) > 0.8);
 dim_pca = aux(1, 1);
-model_pca = pca(dataCHD_normalized{1,1}.X, dim_pca); % acredito que os novos dados 
-% sejam tambem diminuidos a 4 dimensoes por este modelo.
+model_pca = pca(dataCHD_normalized{1,1}.X, dim_pca);
 
-% Dimensionality of the data was reduced from 15 to 4
-dataCHD_normalized_proj_pca_train = linproj(dataCHD_normalized{1,1}.X, model_pca);
-% com 4 dimensoes ja seriam apenas 6 plots.
+% create data structures with the projected data
+dataCHD_normalized_proj_pca = dataCHD_normalized;
+dataCHD_normalized_proj_pca{1,1}.X = linproj(dataCHD_normalized{1,1}.X, model_pca);
+dataCHD_normalized_proj_pca{1,1}.dim = dim_pca;
+dataCHD_normalized_proj_pca{1,2}.X = linproj(dataCHD_normalized{1,2}.X, model_pca);
+dataCHD_normalized_proj_pca{1,2}.dim = dim_pca;
 
 % percentage of variance preserved
 R_pca = sum(model_pca.eigval(1 : dim_pca, 1).^2) / sum(model_pca.eigval(:, 1).^2);
@@ -180,13 +181,26 @@ R_pca = sum(model_pca.eigval(1 : dim_pca, 1).^2) / sum(model_pca.eigval(:, 1).^2
 
 copy_dataCHD_normalized_train = dataCHD_normalized{1,1};
 copy_dataCHD_normalized_train.y = copy_dataCHD_normalized_train.y + 1;
-model_lda = lda(copy_dataCHD_normalized_train);
+copy_dataCHD_normalized_test = dataCHD_normalized{1,2};
+copy_dataCHD_normalized_test.y = copy_dataCHD_normalized_test.y + 1;
+
+dim_lda = size(unique(dataCHD_normalized{1,1}.y), 2) - 1; % dim = n_classes - 1
+
+model_lda = lda(copy_dataCHD_normalized_train, dim_lda);
 model_lda.eigval = real(diag(model_lda.eigval)); % the eigen values are complex
 
 
-
-% Dimensionality of the data was reduced from 15 to 1
-dataCHD_normalized_proj_lda_train = linproj(copy_dataCHD_normalized_train.X, model_lda);
+% create data structures with the projected data
+% dataCHD_normalized_proj_lda = {copy_dataCHD_normalized_train, copy_dataCHD_normalized_test};
+% dataCHD_normalized_proj_lda{1,1}.X = linproj(copy_dataCHD_normalized_train.X, model_lda);
+% dataCHD_normalized_proj_lda{1,1}.dim = dim_lda;
+% dataCHD_normalized_proj_lda{1,2}.X = linproj(copy_dataCHD_normalized_test.X, model_lda);
+% dataCHD_normalized_proj_lda{1,2}.dim = dim_lda;
+dataCHD_normalized_proj_lda = dataCHD_normalized;
+dataCHD_normalized_proj_lda{1,1}.X = linproj(dataCHD_normalized{1, 1}.X, model_lda);
+dataCHD_normalized_proj_lda{1,1}.dim = dim_lda;
+dataCHD_normalized_proj_lda{1,2}.X = linproj(dataCHD_normalized{1, 2}.X, model_lda);
+dataCHD_normalized_proj_lda{1,2}.dim = dim_lda;
 
 % percentage of variance preserved
 % R_lda = sum(model_lda.eigval(1 : dim_lda, 1).^2) / sum(model_lda.eigval(:, 1).^2);
@@ -302,3 +316,128 @@ clear KS_results_inner d aux x_values i e subplot_inx;
 
 %%% the results of the Kolmogorov-Smirnov tests show that thw data is not
 %%% normal with a significance level of 5%
+
+% Total KS
+significance_level = 0.05; % significance level of 5%
+KS_total = cell(dataCHD_normalized_train.dim, 4);
+for i = 1 : dataCHD_normalized_train.dim
+    [KS_total{i, 1}, KS_total{i, 2}, KS_total{i, 3}, KS_total{i, 4}] = kstest(dataCHD_normalized_train.X(i,:), 'alpha', significance_level);
+end
+
+%% Run classifiers
+n_folds = 10;
+% PCA
+k_folds = create_k_folds(dataCHD_normalized_proj_pca{1,1}, n_folds);
+% EMDC
+defaultfilename = 'EMDC_PCA_';
+y_pred_EMDC = cell(1, n_folds);
+for i = 1: n_folds % o teste set e o i, os restantes sao treino
+    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+    
+    data = k_folds{1, i}.X; % current fold (test)
+    % obtain the predictions of the model
+    for e = 1 : k_folds{1, i}.num_data
+        ypred_i(1, e) = EMDC(conc_k_folds, prototypes, data(:, e));
+    end
+    y_pred_EMDC{1, i} = ypred_i;
+    % save to file
+    write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
+end
+
+% MMDC
+defaultfilename = 'MMDC_PCA_';
+y_pred_MMDC = cell(1, n_folds);
+for i = 1: n_folds % o teste set e o i, os restantes sao treino
+    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+    C = calculate_C(conc_k_folds);
+    
+    data = k_folds{1, i}.X; % current fold (test)
+    % obtain the predictions of the model
+    for e = 1 : k_folds{1, i}.num_data
+        ypred_i(1, e) = MMDC(conc_k_folds, C, prototypes, data(:, e));
+    end
+    y_pred_MMDC{1, i} = ypred_i;
+    % save to file
+    write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
+end
+
+% FLDA
+defaultfilename = 'FLDA_PCA_';
+y_pred_FLDA = cell(1, n_folds);
+for i = 1: n_folds % o teste set e o i, os restantes sao treino
+    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+    
+    data = k_folds{1, i}.X; % current fold (test)
+    % obtain the predictions of the model
+    conc_k_folds.y = conc_k_folds.y + 1; % o fld e esquisito e nao sabe o que e binario... (aceita classes a comecar em 1)
+    model_flda = fld(conc_k_folds);
+    ypred_i(1, :) = linclass(data, model_flda);
+
+    y_pred_FLDA{1, i} = ypred_i;
+    % save to file
+    write_to_file(k_folds{1, i}.y, ypred_i - 1, [defaultfilename, num2str(i), '.csv'])
+end
+
+% LDA
+k_folds = create_k_folds(dataCHD_normalized_proj_lda{1,1}, n_folds);
+% EMDC
+defaultfilename = 'EMDC_LDA_';
+y_pred_EMDC = cell(1, n_folds);
+for i = 1: n_folds % o teste set e o i, os restantes sao treino
+    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+    
+    data = k_folds{1, i}.X; % current fold (test)
+    % obtain the predictions of the model
+    for e = 1 : k_folds{1, i}.num_data
+        ypred_i(1, e) = EMDC(conc_k_folds, prototypes, data(:, e));
+    end
+    y_pred_EMDC{1, i} = ypred_i;
+    % save to file
+    write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
+end
+
+% MMDC
+defaultfilename = 'MMDC_LDA_';
+y_pred_MMDC = cell(1, n_folds);
+for i = 1: n_folds % o teste set e o i, os restantes sao treino
+    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+    C = calculate_C(conc_k_folds);
+    
+    data = k_folds{1, i}.X; % current fold (test)
+    % obtain the predictions of the model
+    for e = 1 : k_folds{1, i}.num_data
+        ypred_i(1, e) = MMDC(conc_k_folds, C, prototypes, data(:, e));
+    end
+    y_pred_MMDC{1, i} = ypred_i;
+    % save to file
+    write_to_file(k_folds{1, i}.y, ypred_i, [defaultfilename, num2str(i), '.csv'])
+end
+
+% FLDA
+defaultfilename = 'FLDA_LDA_';
+y_pred_FLDA = cell(1, n_folds);
+for i = 1: n_folds % o teste set e o i, os restantes sao treino
+    ypred_i = zeros(1, k_folds{1, i}.num_data); % save model predictions
+    conc_k_folds = concatenate_k_folds(k_folds, i); % build the data structure without the ith k_fold
+    prototypes = calculate_prototypes(conc_k_folds); % calculate the prototypes of the data
+    
+    data = k_folds{1, i}.X; % current fold (test)
+    % obtain the predictions of the model
+    conc_k_folds.y = conc_k_folds.y + 1; % o fld e esquisito e nao sabe o que e binario... (aceita classes a comecar em 1)
+    model_flda = fld(conc_k_folds);
+    ypred_i(1, :) = linclass(data, model_flda);
+
+    y_pred_FLDA{1, i} = ypred_i;
+    % save to file
+    write_to_file(k_folds{1, i}.y, ypred_i - 1, [defaultfilename, num2str(i), '.csv'])
+end
