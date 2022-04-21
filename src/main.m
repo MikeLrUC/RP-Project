@@ -29,7 +29,7 @@
 % col_names = {'CoronaryHeartDisease', 'MyocardialInfarction', 'KidneyDisease', 'SkinCancer', 'BMI5', 'Smoking', 'AlcoholDrinking', 'Stroke', 'PhysicalHealth', 'MentalHealth', 'DiffWalking', 'Sex', 'AgeCategory', 'Race', 'Diabetic', 'PhysicalActivity', 'GenHealth', 'SleepTime', 'Asthma'};
 
 %% load the dataset
-table = readtable('dataset/heart_2020_cleaned.csv');
+table = readtable('data/heart_2020_cleaned.csv');
 % obter valores com {}
 % obter o nome das colunas com table.Properties.VariableNames
 dependent_vars_names = {table.Properties.VariableNames{1, 1 : 4}};
