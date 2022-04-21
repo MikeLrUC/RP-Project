@@ -324,7 +324,7 @@ for i = 1 : dataCHD_normalized_train.dim
     [KS_total{i, 1}, KS_total{i, 2}, KS_total{i, 3}, KS_total{i, 4}] = kstest(dataCHD_normalized_train.X(i,:), 'alpha', significance_level);
 end
 
-%% Run classifiers
+%% Run kfolds classifiers
 n_folds = 10;
 % PCA
 % k_folds = create_k_folds(dataCHD_normalized_proj_pca{1,1}, n_folds);
@@ -442,40 +442,41 @@ n_folds = 10;
 %     write_to_file(k_folds{1, i}.y, ypred_i - 1, [defaultfilename, num2str(i), '.csv'])
 % end
 
-% ALL data
-data_train = dataCHD_normalized{1, 1}; % train set
-data_test = dataCHD_normalized{1, 2}; % test set
+%% Run ALL data Classifiers
+% PCA
+data_train = dataCHD_normalized_proj_pca{1,1}; % train set
+data_test = dataCHD_normalized_proj_pca{1,2}; % test set
 
 % EMDC
-% defaultfilename = 'EMDC_ALL_';
-% ypred = zeros(1, data_test.num_data); % save model predictions
-% prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
-% 
-% % obtain the predictions of the model
-% for e = 1 : data_test.num_data
-%     ypred(1, e) = EMDC(data_train, prototypes, data_test.X(:, e));
-% end
-% 
-% % save to file
-% write_to_file(data_test.y, ypred, [defaultfilename, num2str(data_test.dim), '.csv'])
+defaultfilename = 'EMDC_PCA_ALL';
+ypred = zeros(1, data_test.num_data); % save model predictions
+prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
+
+% obtain the predictions of the model
+for e = 1 : data_test.num_data
+    ypred(1, e) = EMDC(data_train, prototypes, data_test.X(:, e));
+end
+
+% save to file
+write_to_file(data_test.y, ypred, [defaultfilename, '.csv'])
 
 
 % MMDC
-% defaultfilename = 'MMDC_ALL_';
-% ypred = zeros(1, data_test.num_data); % save model predictions
-% prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
-% C = calculate_C(data_train);
-% 
-% % obtain the predictions of the model
-% for e = 1 : data_test.num_data
-%     ypred(1, e) = MMDC(data_train, C, prototypes, data_test.X(:, e));
-% end
-% 
-% % save to file
-% write_to_file(data_test.y, ypred, [defaultfilename, num2str(data_test.dim), '.csv'])
+defaultfilename = 'MMDC_PCA_ALL';
+ypred = zeros(1, data_test.num_data); % save model predictions
+prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
+C = calculate_C(data_train);
+
+% obtain the predictions of the model
+for e = 1 : data_test.num_data
+    ypred(1, e) = MMDC(data_train, C, prototypes, data_test.X(:, e));
+end
+
+% save to file
+write_to_file(data_test.y, ypred, [defaultfilename, '.csv'])
 
 % FLDA
-defaultfilename = 'FLDA_ALL_';
+defaultfilename = 'FLDA_PCA_ALL';
 
 ypred = zeros(1, data_test.num_data); % save model predictions
 % prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
@@ -486,4 +487,50 @@ model_flda = fld(data_train);
 ypred(1, :) = linclass(data_test.X, model_flda);
 
 % save to file
-write_to_file(data_test.y, ypred - 1, [defaultfilename, num2str(data_test.dim), '.csv'])
+write_to_file(data_test.y, ypred - 1, [defaultfilename, '.csv'])
+
+% ALL data LDA
+data_train = dataCHD_normalized_proj_lda{1,1}; % train set
+data_test = dataCHD_normalized_proj_lda{1,2}; % test set
+
+% EMDC
+defaultfilename = 'EMDC_LDA_ALL';
+ypred = zeros(1, data_test.num_data); % save model predictions
+prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
+
+% obtain the predictions of the model
+for e = 1 : data_test.num_data
+    ypred(1, e) = EMDC(data_train, prototypes, data_test.X(:, e));
+end
+
+% save to file
+write_to_file(data_test.y, ypred, [defaultfilename, '.csv'])
+
+
+% MMDC
+defaultfilename = 'MMDC_LDA_ALL';
+ypred = zeros(1, data_test.num_data); % save model predictions
+prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
+C = calculate_C(data_train);
+
+% obtain the predictions of the model
+for e = 1 : data_test.num_data
+    ypred(1, e) = MMDC(data_train, C, prototypes, data_test.X(:, e));
+end
+
+% save to file
+write_to_file(data_test.y, ypred, [defaultfilename, '.csv'])
+
+% FLDA
+defaultfilename = 'FLDA_LDA_ALL';
+
+ypred = zeros(1, data_test.num_data); % save model predictions
+% prototypes = calculate_prototypes(data_train); % calculate the prototypes of the data_train
+
+% obtain the predictions of the model
+data_train.y = data_train.y + 1; % o fld e esquisito e nao sabe o que e binario... (aceita classes a comecar em 1)
+model_flda = fld(data_train);
+ypred(1, :) = linclass(data_test.X, model_flda);
+
+% save to file
+write_to_file(data_test.y, ypred - 1, [defaultfilename, '.csv'])
