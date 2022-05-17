@@ -4,7 +4,7 @@
 %
 % the dataset has 19 features
 % first 4 ([CoronaryHeartDisease, MyocardialInfarction, KidneyDisease, SkinCancer])
-% are the independent variables and are binary (have two possible values)
+% are the dependent variables and are binary (have two possible values)
 %
 % the rest have different types of values (floats, strings and "binaries")
 %
@@ -42,30 +42,30 @@ classification = class_CHD | class_MI; % Coronary Heart Disease or Myorcardial I
 split = 200000;
 
 % create data structure for Coronary Heart Disease (objective 3.1)
-dataCHD_test.X = table{1 : split, 5 : end}';
-dataCHD_test.y = class_CHD(1 : split, 1)';
+dataCHD_train.X = table{1 : split, 5 : end}';
+dataCHD_train.y = class_CHD(1 : split, 1)';
+dataCHD_train.dim = size(dataCHD_train.X, 1);
+dataCHD_train.num_data = size(dataCHD_train.X, 2);
+dataCHD_train.name = 'Coronary Heart Diseases train dataset.';
+
+dataCHD_test.X = table{split + 1 : end, 5 : end}';
+dataCHD_test.y = class_CHD(split + 1 : end, 1)';
 dataCHD_test.dim = size(dataCHD_test.X, 1);
 dataCHD_test.num_data = size(dataCHD_test.X, 2);
 dataCHD_test.name = 'Coronary Heart Diseases test dataset.';
 
-dataCHD_val.X = table{split + 1 : end, 5 : end}';
-dataCHD_val.y = class_CHD(split + 1 : end, 1)';
-dataCHD_val.dim = size(dataCHD_val.X, 1);
-dataCHD_val.num_data = size(dataCHD_val.X, 2);
-dataCHD_val.name = 'Coronary Heart Diseases validation dataset.';
-
 % create data structure for HeartDisease (objective 3.2)
-dataHD_test.X = table{1 : split, 5 : end}';
-dataHD_test.y = classification(1 : split, 1)';
+dataHD_train.X = table{1 : split, 5 : end}';
+dataHD_train.y = classification(1 : split, 1)';
+dataHD_train.dim = size(dataHD_train.X, 1);
+dataHD_train.num_data = size(dataHD_train.X, 2);
+dataHD_train.name = 'Heart Diseases train dataset.';
+
+dataHD_test.X = table{split + 1: end, 5 : end}';
+dataHD_test.y = classification(split + 1: end)';
 dataHD_test.dim = size(dataHD_test.X, 1);
 dataHD_test.num_data = size(dataHD_test.X, 2);
 dataHD_test.name = 'Heart Diseases test dataset.';
-
-dataHD_val.X = table{split + 1: end, 5 : end}';
-dataHD_val.y = classification(split + 1: end)';
-dataHD_val.dim = size(dataHD_val.X, 1);
-dataHD_val.num_data = size(dataHD_val.X, 2);
-dataHD_val.name = 'Heart Diseases validation dataset.';
 
 
 % create data structure for HeartDisease with comorbidities (objective 3.3)
@@ -79,17 +79,17 @@ Comorbidities = class_KD | class_SC; % skin cancer or kidney disease
 classification = (class_HD & Comorbidities) + class_HD; % se tiver so HD fica a 1, se tiver HD e Comorbidities fica a 2, caso contrario fica 0
 
 % create data structure
-dataHDC_test.X = table{1 : split, 5 : end}';
-dataHDC_test.y = classification(1 : split)';
+dataHDC_train.X = table{1 : split, 5 : end}';
+dataHDC_train.y = classification(1 : split)';
+dataHDC_train.dim = size(dataHDC_train.X, 1);
+dataHDC_train.num_data = size(dataHDC_train.X, 2);
+dataHDC_train.name = 'CoronaryHeartDisease with Comorbidities train dataset.';
+
+dataHDC_test.X = table{split + 1 : end, 5 : end}';
+dataHDC_test.y = classification(split + 1 : end)';
 dataHDC_test.dim = size(dataHDC_test.X, 1);
 dataHDC_test.num_data = size(dataHDC_test.X, 2);
 dataHDC_test.name = 'CoronaryHeartDisease with Comorbidities test dataset.';
-
-dataHDC_val.X = table{split + 1 : end, 5 : end}';
-dataHDC_val.y = classification(split + 1 : end)';
-dataHDC_val.dim = size(dataHDC_val.X, 1);
-dataHDC_val.num_data = size(dataHDC_val.X, 2);
-dataHDC_val.name = 'CoronaryHeartDisease with Comorbidities validation dataset.';
 
 % clear memory
 clear dependent_vars class_KD class_SC Comorbidities class_CHD classification class_MI class_HD;
@@ -100,11 +100,11 @@ clear dependent_vars class_KD class_SC Comorbidities class_CHD classification cl
 % random.
 % - Talvez colocar as structures que sao do mesmo tipo dentro de um cell
 % array:
-dataCHD = {dataCHD_test, dataCHD_val};
-dataHD = {dataHD_test, dataHD_val};
-dataHDC = {dataHDC_test, dataHDC_val};
+dataCHD = {dataCHD_train, dataCHD_test};
+dataHD = {dataHD_train, dataHD_test};
+dataHDC = {dataHDC_train, dataHDC_test};
 
-clear dataHDC_val dataHDC_test dataCHD_val dataCHD_test dataHD_val dataHD_test;
+clear dataHDC_test dataHDC_train dataCHD_test dataCHD_train dataHD_test dataHD_train;
 
 %% PCA (Feature reduction)
 figure_number = 1;
@@ -174,11 +174,6 @@ dataCHD_normalized_proj_pca{1,2}.dim = dim_pca;
 R_pca = sum(model_pca.eigval(1 : dim_pca, 1).^2) / sum(model_pca.eigval(:, 1).^2);
 
 %% LDA (Feature reduction)
-% Como usar LDA (Linear Discriminant Analysis) para fazer feacture
-% reduction? Eu num sei.
-% A funcao lda parece retornar as mesmas coisas que a pca, mas nao sei como
-% os usaria.
-
 copy_dataCHD_normalized_train = dataCHD_normalized{1,1};
 copy_dataCHD_normalized_train.y = copy_dataCHD_normalized_train.y + 1;
 copy_dataCHD_normalized_test = dataCHD_normalized{1,2};
@@ -325,10 +320,16 @@ for i = 1 : dataCHD_normalized_train.dim
 end
 
 %% Run kfolds classifiers
-n_folds = 10;
-% PCA
+
+% ----------------------------------------------------------------------- %
+% NOTE: Updated EMDC and MMDC so that a structure with n samples can be
+% given and it returns the predictions for all of the n samples.
+% ----------------------------------------------------------------------- %
+
+% n_folds = 10;
+% % PCA
 % k_folds = create_k_folds(dataCHD_normalized_proj_pca{1,1}, n_folds);
-% EMDC
+% % EMDC
 % defaultfilename = 'EMDC_PCA_';
 % y_pred_EMDC = cell(1, n_folds);
 % for i = 1: n_folds % o teste set e o i, os restantes sao treino
