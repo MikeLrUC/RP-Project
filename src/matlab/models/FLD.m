@@ -1,4 +1,4 @@
-function [y_pred] = FLD(data_train, data_test)
+function [ypred] = FLD(data_train, data_test)
     % wrapper for the function fld of the stprtool.
     % returns the predictions given by the classifier.
 

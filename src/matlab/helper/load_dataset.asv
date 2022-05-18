@@ -15,7 +15,7 @@ function [dataCHD, dataHD, dataHDC, independent_vars_names] = load_dataset(file_
     classification = class_CHD | class_MI; % Coronary Heart Disease or Myorcardial Infarction (HD ficam a 1, as restantes a 0)
     
     split = 200000;
-    inxs = randperm(size(table.Variables, 1)); % randomize the samples in training and testing sets.
+    inxs = randperm(size(table.Variables, 1));
     
     % create data structure for Coronary Heart Disease (objective 3.1)
     % dataCHD_train.X = table{1 : split, 5 : end}';
@@ -44,9 +44,9 @@ function [dataCHD, dataHD, dataHDC, independent_vars_names] = load_dataset(file_
     dataHD_train.name = 'Heart Diseases train dataset.';
     
     % dataHD_test.X = table{split + 1: end, 5 : end}';
-    dataHD_test.X = table{inxs(1, split + 1 : end), 5 : end}';
+    dataHD_test.X = table{inxs(split + 1, end), 5 : end}';
     % dataHD_test.y = classification(split + 1: end)';
-    dataHD_test.y = classification(inxs(1, split + 1 : end), 1)';
+    dataHD_test.y = classification(split + 1: end)';
     dataHD_test.dim = size(dataHD_test.X, 1);
     dataHD_test.num_data = size(dataHD_test.X, 2);
     dataHD_test.name = 'Heart Diseases test dataset.';
@@ -64,17 +64,15 @@ function [dataCHD, dataHD, dataHDC, independent_vars_names] = load_dataset(file_
     
     % create data structure
     % dataHDC_train.X = table{1 : split, 5 : end}';
-    dataHDC_train.X = table{inxs(1, 1 : split), 5 : end}';
-    % dataHDC_train.y = classification(1 : split)';
-    dataHDC_train.y = classification(inxs(1, 1 : split), 1)';
+    dataHDC_train.X = table{inxs(1, split), 5 : end}';
+    dataHDC_train.y = classification(1 : split)';
     dataHDC_train.dim = size(dataHDC_train.X, 1);
     dataHDC_train.num_data = size(dataHDC_train.X, 2);
     dataHDC_train.name = 'CoronaryHeartDisease with Comorbidities train dataset.';
     
     % dataHDC_test.X = table{split + 1 : end, 5 : end}';
-    dataHDC_test.X = table{inxs(1, split + 1 : end), 5 : end}';
-    % dataHDC_test.y = classification(split + 1 : end)';
-    dataHDC_test.y = classification(inxs(1, split + 1 : end), 1)';
+    dataHDC_test.X = table{inxs(split + 1, end), 5 : end}';
+    dataHDC_test.y = classification(split + 1 : end)';
     dataHDC_test.dim = size(dataHDC_test.X, 1);
     dataHDC_test.num_data = size(dataHDC_test.X, 2);
     dataHDC_test.name = 'CoronaryHeartDisease with Comorbidities test dataset.';
