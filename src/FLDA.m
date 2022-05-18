@@ -1,10 +1,13 @@
 function [model] = FLDA(data, prototypes, new_dim)
+    % I THINK THIS DOES NOT WORK, DO NOT USE IT.
+    % Use the one from the stprtool.
+
     % https://sthalles.github.io/fisher-linear-discriminant/
 
     % data -> structure with the dataset
     % prototypes -> prototypes for each classe in the dataset
     % new_dim -> the new dimension that we want the dataset to have (it has
-    % to be between 1 and c-1, with being the number of classes in the
+    % to be between 1 and c-1, with c being the number of classes in the
     % dataset)
     
     % obter as classes
@@ -33,7 +36,7 @@ function [model] = FLDA(data, prototypes, new_dim)
     % retornar os dim maiores eigenvectors
     [new_D, inxs] = sort(diag(D), 1, 'descend');
     
-    W = zeros(data.dim, dim);
+    W = zeros(data.dim, new_dim);
     for i = 1 : new_dim
         W(:, i) = V(:, inxs(1, i));
     end
