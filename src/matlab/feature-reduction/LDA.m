@@ -13,7 +13,6 @@ function [new_data_train, new_data_test] = LDA(data_train, data_test, new_dim)
     classes = unique(data.y, 'sorted');
     n_classes = size(classes, 2);
 
-    % if new_dim < n_classes - 1 || new_dim > data_train.dim
     temp = min(n_classes - 1, data_train.dim);
     if new_dim > temp
         fprintf("The dimension value given is not valid. It must be less or equal to %d.\nIt defaulted to %d.\n", temp, temp);
