@@ -1,4 +1,4 @@
-function [new_data_train, new_data_test] = PCA(data_train, data_test, new_dim)
+function [new_data_train, new_data_test, model] = PCA(data_train, data_test, new_dim)
     % data_train: structure with the train dataset to which we want to apply PCA.
     % data_test: structure with the test dataset to which we want to apply PCA.
     % new_dim: the new dimension that we want the dataset to be (must be
@@ -13,13 +13,13 @@ function [new_data_train, new_data_test] = PCA(data_train, data_test, new_dim)
     % - cumulative variance
 
     % check if the value of new_dim is valid
-    if new_dim > data_train.dim
+    if ~(1 <= new_dim && new_dim <= data_train.dim)
         fprintf("The dimension value given is not valid. It must be less or equal to %d.\nIt defaulted to %d.\n", data_train.dim, data_train.dim);
         new_dim = data_train.dim;
     end
 
     % obtain the lda model
-    model = pca(data_train.X);
+    model = pca(data_train.X, new_dim);
     
     % create the data structures with the projected data
     %train

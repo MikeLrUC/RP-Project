@@ -12,11 +12,10 @@ function [new_data_train, new_data_test, KW_results, chi_sqrt_values] = kruskalw
     % returns a data structure with the new_dim most discriminant features
     
     % check if new_dim is valid
-    if new_dim > data_train.dim
+    if ~(1 <= new_dim && new_dim <= data_train.dim)
         fprintf("The dimension value given is not valid. It must be less or equal to %d.\nIt defaulted to %d.\n", data_train.dim, data_train.dim);
         new_dim = data_train.dim;
     end
-    
     % for Kruskal Wallis
     KW_results = cell(data_train.dim, 3);
     chi_sqrt_values = zeros(1, data_train.dim);
@@ -25,7 +24,7 @@ function [new_data_train, new_data_test, KW_results, chi_sqrt_values] = kruskalw
         if plot
             subplot(3, 5, current_feature);
             hold on;
-            boxplot(data_train.X, data_train.y); % boxplot the data
+            boxplot(data_train.X(current_feature, :), data_train.y); % boxplot the data
             title(independent_vars_names(1, current_feature));
             hold off;
         end
@@ -55,16 +54,16 @@ function [new_data_train, new_data_test, KW_results, chi_sqrt_values] = kruskalw
         % heatmap
         feature_names = independent_vars_names;
         figure;
-        heatmap(corr_matrix, 'XData', feature_names, 'YData', feature_names );
+        heatmap(corr_matrix, 'XData', feature_names, 'YData', feature_names);
     end
 
     % create the new data structures with the new_dim most discriminant
     % features
     % train
     new_data_train = data_train;
-    new_data_train.X = data_train.X(indexes(1, end - new_dim + 1, end), :); % select the new_dim best features
+    new_data_train.X = data_train.X(indexes(1, end - new_dim + 1 : end), :); % select the new_dim best features
     new_data_train.dim = new_dim;
-    %test
+    % test
     new_data_test = data_test;
     new_data_test.X = data_test.X(indexes(1, end - new_dim + 1 : end), :); % select the new_dim best features
     new_data_test.dim = new_dim;

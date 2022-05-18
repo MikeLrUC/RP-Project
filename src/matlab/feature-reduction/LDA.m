@@ -1,4 +1,4 @@
-function [new_data_train, new_data_test] = LDA(data_train, data_test, new_dim)
+function [new_data_train, new_data_test, model] = LDA(data_train, data_test, new_dim)
     % data_train: structure with the train dataset to which we want to apply LDA.
     % data_test: structure with the test dataset to which we want to apply LDA.
     % new_dim: the new dimension that we want the dataset to be (must be
@@ -10,11 +10,11 @@ function [new_data_train, new_data_test] = LDA(data_train, data_test, new_dim)
 
 
     % check if the value of new_dim is valid
-    classes = unique(data.y, 'sorted');
+    classes = unique(data_train.y, 'sorted');
     n_classes = size(classes, 2);
 
     temp = min(n_classes - 1, data_train.dim);
-    if new_dim > temp
+    if ~(1 <= new_dim && new_dim <= temp)
         fprintf("The dimension value given is not valid. It must be less or equal to %d.\nIt defaulted to %d.\n", temp, temp);
         new_dim = temp;
     end
