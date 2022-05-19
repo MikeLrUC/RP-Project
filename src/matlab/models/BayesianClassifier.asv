@@ -1,0 +1,12 @@
+function [ypred] = BayesianClassifier(data_train, data_test)
+    % data_train: structure with the training dataset.
+    % data_train: structure with the testing dataset.
+    
+    % get the numner
+
+    % create the Maximal Likelihood estimation of Gaussian mixture model
+    % for each class
+
+    model = mlcgmm(data_train);
+
+end
