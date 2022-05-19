@@ -17,10 +17,13 @@ function app_main(scenario, scale, assess, technique, n_features)
     switch scenario
         case "1"
             data = data_sc1;
+            class_labels = {'NO CHD', 'CHD'};
         case "2"
             data = data_sc2;
+            class_labels = {'No HD', 'HD'};
         case "3" 
             data = data_sc3;
+            class_labels = {'No HD', 'HD', 'HDC'};
         otherwise
             disp("Wrong Scenario Value!!")
     end
@@ -38,7 +41,6 @@ function app_main(scenario, scale, assess, technique, n_features)
         
         n_classes = size(unique(data{1}.y), 2);
         KS_results = cell(1, n_classes); 
-        class_labels = {'NO CHD', 'CHD'}; %TODO: mudar isto
         
         % Significance Level
         significance_level = 0.05; 
@@ -70,7 +72,7 @@ function app_main(scenario, scale, assess, technique, n_features)
                 
                 histfit(aux, n_bins);
                 
-                title(strcat(feature_names(1, i), " | ", class_labels(1, c)));
+                title(strcat(feature_names(1, i), " | ", class_labels(c)));
 
                 % Empirical CDF vs Standard CDF
                 subplot(3, 5 * 2, subplot_idx);
@@ -82,7 +84,7 @@ function app_main(scenario, scale, assess, technique, n_features)
                     legend('Empirical CDF','Standard Normal CDF','Location','best')
                 hold off;
                 
-                title(strcat(feature_names(1, i), " | ", class_labels(1, c)));
+                title(strcat(feature_names(1, i), " | ", class_labels(c)));
             end
             KS_results{c} = KS_results_inner;
         end
