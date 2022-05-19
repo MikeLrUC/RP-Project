@@ -15,7 +15,9 @@ function [report, class_labels] = app_main(scenario, scale, assess, technique, n
     
     % Close all previous Plots
     close all;
-        
+    
+    n_folds = 2;
+    
     %%% 1 - Load Scenario Data %%%
     [data_sc1, data_sc2, data_sc3, feature_names] = load_dataset('data/heart_2020_cleaned.csv');
     switch scenario
@@ -119,7 +121,7 @@ function [report, class_labels] = app_main(scenario, scale, assess, technique, n
     switch hyperparams.name
         case "K - Nearest Neighbors"
             neighbors = eval(hyperparams.neighbors);
-            test_best_k_KNN(data{1}, neighbors, hyperparams.n_folds);
+            test_best_k_KNN(data{1}, neighbors, n_folds);
         case "Support Vector Machine"
             gamma_values = eval(hyperparams.gamma);
             cost_values = eval(hyperparams.cost);
