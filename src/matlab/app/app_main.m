@@ -1,4 +1,4 @@
-function app_main(scenario, scale, assess, technique, n_features, hyperparams, classifier)
+function [report, class_labels] = app_main(scenario, scale, assess, technique, n_features, hyperparams, classifier)
     % Handler function for the matlab App
     % Paramenters
     %   - scenario: int (1, 2, 3) for the assignment scenario
@@ -6,17 +6,17 @@ function app_main(scenario, scale, assess, technique, n_features, hyperparams, c
     %   - assess: bool to make feature assessment
     %   - technique: Feature Selection/Reduction Technique ("None", "KW", "LDA", "PCA")
     %   - n_features: Number of most discriminant Features chosen by user, based on the technique
-    %   - hyperparams: data structure with grid search parameters
+    %   - hyperparams: data structure with grid search of parameters
     %       - name: Model's Name
     %       - * : any parameters and respective value, for each model
-    %   - classifier: data structure with
+    %   - classifier: data structure with:
     %       - name: Model's Name
     %       - * : any parameters and respective value
     
     % Close all previous Plots
     close all;
     
-    n_folds = 1;
+    n_folds = 2;
     
     %%% 1 - Load Scenario Data %%%
     [data_sc1, data_sc2, data_sc3, feature_names] = load_dataset('data/heart_2020_cleaned.csv');
@@ -114,7 +114,7 @@ function app_main(scenario, scale, assess, technique, n_features, hyperparams, c
         otherwise
             disp("No Feature Selection/Reduction technique was chosen!!")
     end
-    
+    pause(0.000005) % To be able to show the plots before the classifier results
     
     %%% 5 - Hyperparameters Tunning %%%
     
@@ -123,37 +123,42 @@ function app_main(scenario, scale, assess, technique, n_features, hyperparams, c
             neighbors = eval(hyperparams.neighbors);
             test_best_k_KNN(data{1}, neighbors, n_folds);
         case "Support Vector Machine"
-            gamma_values = hyperparams.gamma;
-            cost_values = hyperparams.cost;
-            % TODO: svm Grid search gamma vs cost and plot figure
+            gamma_values = eval(hyperparams.gamma);
+            cost_values = eval(hyperparams.cost);
+            test_best_C_Gamma_SVM(data{1}, cost_values, gamma_values, n_folds);
         otherwise
             disp("No model's parameters search specified!!")
     end
     
     
     %%% 6 - Classification %%%
-    
-    switch classifier.name
-        case "Euclidean Linear Discriminant"
-            EMDC(data{1}, data{2});
-        case "Mahalanobis Linear Discriminant"
-            MMDC(data{1}, data{2});
-        case "Fisher Linear Discriminant"
-            FLD(data{1}, data{2});
-        case "K - Nearest Neighbors"
-            neighbors = eval(classifier.neighbors);
-            KNN(data{1}, data{2}, neighbors);
-        case "Bayesian Classifier"
-            BayesianClassifier(data{1}, data{2});
-        case "Support Vector Machine"
-            cost = eval(classifier.cost);
-            gamma = eval(classifier.gamma);
-            % TODO: svm
-        otherwise
-            disp("No classifer was specified!!")
-    end
-    
-    % TODO: Show Evaluation Metrics  
-    
-    % TODO: Save Models
+    if ~strcmp(classifier.name, "None")
+        switch classifier.name
+            case "Euclidean Linear Discriminant"
+                [ypred, ~] = EMDC(data{1}, data{2});
+            case "Mahalanobis Linear Discriminant"
+                [ypred, ~] = MMDC(data{1}, data{2});
+            case "Fisher Linear Discriminant"
+                if length(class_labels) <= 2
+                    ypred = FLD(data{1}, data{2});
+                else
+                    ypred = MulticlassFLD(data{1}, data{2});
+                end
+            case "K - Nearest Neighbors"
+                neighbors = eval(classifier.neighbors);
+                ypred = KNN(data{1}, data{2}, neighbors);
+            case "Bayesian Classifier"
+                ypred = BayesianClassifier(data{1}, data{2});
+            case "Support Vector Machine"
+                cost = eval(classifier.cost);
+                gamma = eval(classifier.gamma);
+                ypred = SVM(data{1}, data{2}, cost, gamma);
+            otherwise
+                disp("No classifer was specified!!")
+        end
+
+        %%% Evaluation Metrics  %%%
+        report = classification_report(double(data{2}.y), double(ypred), class_labels);
+    end 
+    % save ; % For debugging purposes
 end
