@@ -125,35 +125,29 @@ function app_main(scenario, scale, assess, technique, n_features, hyperparams, c
         case "Support Vector Machine"
             gamma_values = hyperparams.gamma;
             cost_values = hyperparams.cost;
-            % TODO: svm Grid search gamma vs cost and plot figure
+            % TODO: Grid search gamma vs cost and plot figure
         otherwise
             disp("No model's parameters search specified!!")
     end
-    
     
     %%% 6 - Classification %%%
     
     switch classifier.name
         case "Euclidean Linear Discriminant"
-            EMDC(data{1}, data{2});
+            disp("euc")
         case "Mahalanobis Linear Discriminant"
-            MMDC(data{1}, data{2});
+            disp("mah")
         case "Fisher Linear Discriminant"
-            FLD(data{1}, data{2});
+            disp("fish")
         case "K - Nearest Neighbors"
-            neighbors = eval(classifier.neighbors);
-            KNN(data{1}, data{2}, neighbors);
+            neighbors = eval(hyperparams.neighbors);
         case "Bayesian Classifier"
-            BayesianClassifier(data{1}, data{2});
+            disp("BC")
         case "Support Vector Machine"
-            cost = eval(classifier.cost);
-            gamma = eval(classifier.gamma);
-            % TODO: svm
+            % TODO:
+            disp("svm")
         otherwise
             disp("No classifer was specified!!")
     end
     
-    % TODO: Show Evaluation Metrics  
-    
-    % TODO: Save Models
 end

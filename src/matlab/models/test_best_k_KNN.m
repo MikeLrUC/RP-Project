@@ -68,6 +68,8 @@ function [best_k, mean_errors_per_k, std_errors_per_k] = test_best_k_KNN(data_tr
     best_k = ks(1, inx);
 
     % plot the errors per k for training and for validation.
+    figure;
+    
     subplot(2, 1, 1);
     errorbar(mean_errors_per_k(1, :), std_errors_per_k(1, :), 'linewidth', 2, 'color', '#0076a8'); % training set
     xlabel('k');
