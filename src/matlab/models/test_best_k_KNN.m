@@ -38,11 +38,14 @@ function [best_k, mean_errors_per_k, std_errors_per_k] = test_best_k_KNN(data_tr
             conc_k_folds = concatenate_k_folds(k_folds, i);
             fprintf("Juntou folds\n");
             % criar modelo
-            model = knnrule(conc_k_folds, ks(1, e));
+            % model = knnrule(conc_k_folds, ks(1, e));
+            model = fitcknn(conc_k_folds.X', conc_k_folds.y', 'NumNeighbors', ks(1, e)); % fitcknn receives the matrix that has the samples by row and features as columns.
             disp("treinou modelo")
-            ypred_train = knnclass(conc_k_folds.X, model); % predictions for the training data (what it already saw)
+            % ypred_train = knnclass(conc_k_folds.X, model); % predictions for the training data (what it already saw)
+            ypred_train = predict(model, conc_k_folds.X')'; % predictions for the training data (what it already saw)
             disp("classificou training test")
-            ypred_validation = knnclass(k_folds{1, i}.X, model); % predictions for the validation data (what it did not see)
+            % ypred_validation = knnclass(k_folds{1, i}.X, model); % predictions for the validation data (what it did not see)
+            ypred_validation = predict(model, k_folds{1, i}.X')'; % predictions for the validation data (what it did not see)
             disp("classificou validation test")
             fprintf("calculou modelo e fez previsoes\n");
             

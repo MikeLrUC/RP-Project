@@ -6,9 +6,11 @@ function [ypred] = KNN(data_train, data_test, k)
     % returns the predictions of the knn model.
 
     % get the classifier
-    model = knnrule(data_train, k);
+    % model = knnrule(data_train, k);
+    model = fitcknn(data_train.X', data_train.y', 'NumNeighbors', k);
 
     % get the predictions of the classifier
-    ypred = knnclass(data_test.X, model);
+    % ypred = knnclass(data_test.X, model);
+    ypred = predict(model, data_test.X')';  
 
 end
