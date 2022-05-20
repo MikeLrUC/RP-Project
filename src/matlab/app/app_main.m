@@ -158,5 +158,5 @@ function [report, class_labels] = app_main(scenario, scale, assess, technique, n
         %%% Evaluation Metrics  %%%
         report = classification_report(double(data{2}.y), double(ypred), class_labels);
     end 
-    % save ; % For debugging purposes
+    save ; % For debugging purposes
 end
