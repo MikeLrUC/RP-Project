@@ -102,13 +102,13 @@ function [report, class_labels] = app_main(scenario, scale, assess, technique, n
             disp("Maybe one day")
         case "KW"
             [data{1}, data{2}, KW_results, chi_sq_results] = kruskalwallis_test(data{1}, data{2}, n_features, true, feature_names);
-            figure; plot(1:length(chi_sq_results), sort(chi_sq_results))
+            figure; plot(1:length(chi_sq_results), sort(chi_sq_results), '-o')
         case "PCA"
             [data{1}, data{2}, model] = PCA(data{1}, data{2}, n_features);
-            figure; hold on; yline(1); plot(1:length(model.eigval), model.eigval); hold off;
+            figure; hold on; yline(1); plot(1:length(model.eigval), model.eigval, '-o'); hold off;
         case "LDA"
             [data{1}, data{2}, model] = LDA(data{1}, data{2}, n_features);
-            figure; hold on; yline(1); plot(1:length(model.eigval), model.eigval); hold off;
+            figure; hold on; yline(1); plot(1:length(model.eigval), model.eigval, '-o'); hold off;
         otherwise
             disp("No Feature Selection/Reduction technique was chosen!!")
     end

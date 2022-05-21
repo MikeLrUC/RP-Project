@@ -47,15 +47,15 @@ function [new_data_train, new_data_test, KW_results, chi_sqrt_values] = kruskalw
     end
     disp('most discriminant.')
     
-    if plot
-        % correlation matrix
-        corr_matrix = corr(data_train.X(:, :)');
-    
-        % heatmap
-        feature_names = independent_vars_names;
-        figure;
-        heatmap(corr_matrix, 'XData', feature_names, 'YData', feature_names);
-    end
+%     if plot
+%         % correlation matrix
+%         corr_matrix = corr(data_train.X(:, :)');
+%     
+%         % heatmap
+%         feature_names = independent_vars_names;
+%         figure;
+%         heatmap(corr_matrix, 'XData', feature_names, 'YData', feature_names);
+%     end
 
     % create the new data structures with the new_dim most discriminant
     % features
