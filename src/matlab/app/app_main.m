@@ -102,13 +102,16 @@ function [report, class_labels] = app_main(scenario, scale, assess, technique, n
             disp("Maybe one day")
         case "KW"
             [data{1}, data{2}, KW_results, chi_sq_results] = kruskalwallis_test(data{1}, data{2}, n_features, true, feature_names);
-            figure; plot(1:length(chi_sq_results), sort(chi_sq_results), '-o')
+            scree_plot(sort(chi_sq_results, 'descend'), false,"Kruskal-Wallis Chi-Square Values", "Feature", "Chi-Square")
+            cumulative_plot(sort(chi_sq_results, 'descend'), "Cumulative Chi-Squared Plot", "Features", "Cumulative Values")
         case "PCA"
             [data{1}, data{2}, model] = PCA(data{1}, data{2}, n_features);
-            figure; hold on; yline(1); plot(1:length(model.eigval), model.eigval, '-o'); hold off;
+            scree_plot(model.eigval, true, "Scree Plot", "Features", "Values");
+            cumulative_plot(model.eigval, "Cumulative Variance Plot", "Features", "Cumulative Variance")
         case "LDA"
             [data{1}, data{2}, model] = LDA(data{1}, data{2}, n_features);
-            figure; hold on; yline(1); plot(1:length(model.eigval), model.eigval, '-o'); hold off;
+            scree_plot(model.eigval, true, "Scree Plot", "Features", "Values");
+            cumulative_plot(model.eigval, "Cumulative Variance Plot", "Features", "Cumulative Variance")
         otherwise
             disp("No Feature Selection/Reduction technique was chosen!!")
     end

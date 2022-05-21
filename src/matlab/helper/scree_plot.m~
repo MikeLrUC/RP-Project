@@ -1,0 +1,11 @@
+function scree_plot(values, title, xlabel, ylabel)
+    figure;
+    hold on;
+        yline(1)
+        plot(1:length(values), values, "-o")
+    hold off;
+    legend(["Kaiser threshold", "Eigenvalues"])
+    xlabel("Features")
+    ylabel("Values")
+    title("Scree Plot")
+end
