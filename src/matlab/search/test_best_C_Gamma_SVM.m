@@ -33,6 +33,7 @@ function [best_C, best_Gamma] = test_best_C_Gamma_SVM(data_train, Cs, Gammas, n_
                clear model;
                
                % Create Model
+               % t = templateSVM('KernelFunction', 'rbf', 'BoxConstraint', Cs(c), 'KernelScale', sqrt(1 / (2 * Gammas(gamma))), 'Solver', 'SMO', 'Standardize', true);
                t = templateSVM('KernelFunction', 'rbf', 'BoxConstraint', Cs(c), 'KernelScale', sqrt(1 / (2 * Gammas(gamma))), 'Solver', 'SMO');
                model = fitcecoc(conc_k_folds.X', conc_k_folds.y', 'Coding', 'onevsall', 'Learners', t);
 
@@ -51,7 +52,7 @@ function [best_C, best_Gamma] = test_best_C_Gamma_SVM(data_train, Cs, Gammas, n_
     end
     
     figure;
-    contourf(Cs, Gammas, merr);
+    contourf(Gammas, Cs, merr);
     xlabel('Gamma');
     ylabel('Cost');
     % set(gca, 'xtick', g_pot([1:5:numel(g_pot)]))
@@ -69,8 +70,8 @@ function [best_C, best_Gamma] = test_best_C_Gamma_SVM(data_train, Cs, Gammas, n_
     
     hold on;
     fprintf('\nAverage Best Combination C = %d\n and Gamma value = %d\n', Cs(ix), Gammas(iy));
-    plot(Cs(ix), Gammas(iy), 'rx', 'markersize', 8, 'linewidth', 1);
-    plot(Cs(ix), Gammas(iy), 'mo', 'markersize', 8, 'linewidth', 1);
+    plot(Gammas(iy), Cs(ix), 'rx', 'markersize', 8, 'linewidth', 1);
+    plot(Gammas(iy), Cs(ix), 'mo', 'markersize', 8, 'linewidth', 1);
     hold off;
 
     % save the best parameters to return them

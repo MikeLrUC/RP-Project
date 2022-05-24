@@ -74,7 +74,7 @@ function [best_k, mean_errors_per_k, std_errors_per_k] = test_best_k_KNN(data_tr
     figure;
     
     subplot(2, 1, 1);
-    errorbar(mean_errors_per_k(1, :), std_errors_per_k(1, :), 'linewidth', 2, 'color', '#0076a8'); % training set
+    errorbar(ks, mean_errors_per_k(1, :), std_errors_per_k(1, :), 'linewidth', 2, 'color', '#0076a8'); % training set
     xlabel('k');
     ylabel('error (%)');
     title('Training set.');
@@ -82,7 +82,7 @@ function [best_k, mean_errors_per_k, std_errors_per_k] = test_best_k_KNN(data_tr
 
     subplot(2, 1, 2);
     hold on;
-    errorbar(mean_errors_per_k(2, :), std_errors_per_k(2, :), 'linewidth', 2, 'color', '#0076a8'); % validation set
+    errorbar(ks, mean_errors_per_k(2, :), std_errors_per_k(2, :), 'linewidth', 2, 'color', '#0076a8'); % validation set
     plot(ks, ones(1, size(ks, 2)) * min_error, '--', 'color', '#D95319', 'linewidth', 2);
     xlabel('k');
     ylabel('error (%)');
